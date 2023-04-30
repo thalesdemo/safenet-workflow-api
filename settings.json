@@ -1,0 +1,7 @@
+{
+  "base_url": "https://cloud.us.safenetid.com",
+  "username": "<operator_email>",
+  "password": "<operator_password>",
+  "key_hash": "<api_key_hash>"
+}
+

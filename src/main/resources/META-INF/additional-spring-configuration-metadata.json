@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "api.basePath",
+      "type": "java.lang.String",
+      "description": "A description for 'api.basePath'"
+    },
+    {
+      "name": "api.user.delimiter",
+      "type": "java.lang.String",
+      "description": "A description for 'api.user.delimiter'"
+    },
+    {
+      "name": "safenet.workflow.config.path",
+      "type": "java.lang.String",
+      "description": "A description for 'safenet.workflow.config.path'"
+    }
+  ]
+}
