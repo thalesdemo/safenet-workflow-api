@@ -6,9 +6,9 @@
 - [Requirements](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#requirements)
 - [Deployment Steps](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#instructions)
   - [Generate API Key](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-1-generate-an-api-key)
-  - [Customize Configuration File](<https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-2-customize-the-configuration-file-(settings.json)>)
+  - [Customize Configuration File](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-2-customize-the-configuration-file-settingsjson)
   - [Run JAR File](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-3-run-the-jar-file)
-- [Final Thoughts](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#conclusion)
+- [Final Thoughts](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#final-thoughts)
 
 ## Summary
 
