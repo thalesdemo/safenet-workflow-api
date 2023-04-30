@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-- [Summary](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#introduction)
+- [Summary](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#summary)
 - [Requirements](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#requirements)
 - [Deployment Steps](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#instructions)
   - [Generate API Key](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-1-generate-an-api-key)
@@ -81,7 +81,7 @@ Now, update each field as follows:
 - `base_url`: Enter the SafeNet server base URL (e.g., https://cloud.us.safenetid.com for the US service zone)
 - `username`: Enter the operator's email address
 - `password`: Enter the operator's static password
-- `key_hash`: Replace with the apiKeyHash generated in Step 1
+- `key_hash`: Replace with the apiKeyHash generated in [Step 1](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-1-generate-an-api-key)
 
 ### Step 3: Run the JAR File
 
