@@ -305,6 +305,7 @@ public class EnrollmentService {
             String activationString = this.getMobilePassBase64ActivationString(enrollmentRequest.getUsername(),
                     enrollmentRequest.getOrganization(), tokenData.getProvId());
 
+            Log.log(Level.FINEST, "MobilePASS activation string received from SafeNet server: {0}", activationString);
             // Set tokenData state based on activation string and set URL
             if (activationString == null || activationString.isEmpty()) {
                 tokenData.setState(EnrollmentStatus.ERROR.getValue());

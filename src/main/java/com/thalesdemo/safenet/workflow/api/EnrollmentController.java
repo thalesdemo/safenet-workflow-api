@@ -21,7 +21,7 @@
  * the {@code @RequestMapping} annotation.
  *
  * The class has a single method, "enrollToken", which handles POST requests to 
- * the "/token/enroll/{partner_id}/{username}" endpoint of the API. The method
+ * the "/token/enroll/{realm_id}/{username}" endpoint of the API. The method
  * takes in a number of parameters and a {@code EnrollmentRequest} object in 
  * the request body, and returns an {@code EnrollmentResponse} object.
  *
@@ -62,7 +62,7 @@ public class EnrollmentController {
         EnrollmentService enrollmentService;
 
         /**
-         * The delimiter used to separate the partner ID and username in the unique
+         * The delimiter used to separate the realm ID and username in the unique
          * username.
          */
         @Value("${api.user.delimiter}")
@@ -71,7 +71,7 @@ public class EnrollmentController {
         /**
          * Handles requests for enrolling tokens for users.
          * 
-         * @param partnerId         The partner ID of the user for which to enroll a
+         * @param realmId           The realm ID of the user for which to enroll a
          *                          token.
          * @param username          The username for which to enroll a token.
          * @param organization      The name of the organization.
@@ -81,11 +81,12 @@ public class EnrollmentController {
          * @return An {@code EnrollmentResponse} object with details of the enrollment
          *         process.
          */
+
         @Operation(summary = "Enroll a token to a given user", description = "Enroll a token to a user's account.")
         @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EnrollmentResponse.class), examples = @ExampleObject(description = "API enrollment", value = "To do")), description = "The enrollment was successful via API.")
-        @PostMapping("/{partner_id}/{username}")
+        @PostMapping("/{realm_id}/{username}")
         public EnrollmentResponse enrollToken(
-                        @Parameter(description = "The partner ID of the user for which to enroll a token.") @PathVariable("partner_id") String partnerId,
+                        @Parameter(description = "The realm ID of the user for which to enroll a token.") @PathVariable("realm_id") String realmId,
                         @Parameter(description = "The username for which to enroll a token.") @PathVariable("username") String username,
                         @Parameter(description = "The name of the organization.") @RequestParam(value = "organization") String organization,
                         @Parameter(description = "The type of token for which to enroll.", schema = @Schema(type = "string", allowableValues = {
@@ -98,8 +99,8 @@ public class EnrollmentController {
                         })) @RequestParam(value = "method") EnrollmentMethod enrollmentMethod,
                         @RequestBody @Schema(example = EnrollmentExamples.REQUEST) EnrollmentRequest enrollmentRequest) {
 
-                // Combine partner ID and username to form a unique username
-                String uniqueUsername = partnerId + delimiter + username;
+                // Combine realm ID and username to form a unique username
+                String uniqueUsername = UserUtils.getUniqueUsername(realmId, delimiter, username);
 
                 // Set the necessary fields in the enrollment request
                 enrollmentRequest.setUsername(uniqueUsername);

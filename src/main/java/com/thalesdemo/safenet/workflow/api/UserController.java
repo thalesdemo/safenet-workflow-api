@@ -21,9 +21,9 @@
  * The UserController class is responsible for handling requests related to
  * user accounts. It exposes methods for creating, updating, retrieving and 
  * deleting user accounts. These methods receive input parameters such as 
- * partner ID, username, and organization name to identify the user account 
+ * realm ID, username, and organization name to identify the user account 
  * to act on. The class relies on the UserService to perform these operations,
- * and the delimiter string property is used to concatenate the partner ID and
+ * and the delimiter string property is used to concatenate the realm ID and
  * username to form a unique username. The class also logs warnings for 
  * unimplemented methods.
  * 
@@ -72,7 +72,7 @@ public class UserController {
 
     /**
      * 
-     * The delimiter string used to separate the partner ID and username in unique
+     * The delimiter string used to separate the realm ID and username in unique
      * usernames.
      * Obtained from the "api.user.delimiter" configuration property.
      */
@@ -82,21 +82,21 @@ public class UserController {
     /**
      * Retrieves account details of a given user.
      * 
-     * @param partnerId    The partner ID of the user for which to retrieve account
+     * @param realmId      The realm ID of the user for which to retrieve account
      *                     details.
      * @param username     The username for which to retrieve account details.
      * @param organization The name of the organization.
      * @return UserSchema containing the account details of the user.
      */
     @Operation(summary = "Get account details of a given user", description = "Retrieve information about a given user account.")
-    @GetMapping("/{partner_id}/{username}")
+    @GetMapping("/{realm_id}/{username}")
     public UserSchema getUser(
-            @Parameter(description = "The partner ID of the user for which to retrieve account details.") @PathVariable("partner_id") String partnerId,
+            @Parameter(description = "The realm ID of the user for which to retrieve account details.") @PathVariable("realm_id") String realmId,
             @Parameter(description = "The username for which to retrieve account details.") @PathVariable("username") String username,
             @Parameter(description = "The name of the organization.") @RequestParam("organization") String organization) {
-        // Constructs a unique username by concatenating the partner ID, delimiter, and
+        // Constructs a unique username by concatenating the realm ID, delimiter, and
         // username
-        String uniqueUsername = partnerId + delimiter + username;
+        String uniqueUsername = UserUtils.getUniqueUsername(realmId, delimiter, username);
 
         // Calls the UserService to retrieve the user information based on the unique
         // username and organization
@@ -107,7 +107,7 @@ public class UserController {
     /**
      * Creates an account for a given user.
      * 
-     * @param partnerId    The partner ID of the user for which to create an
+     * @param realmId      The realm ID of the user for which to create an
      *                     account.
      * @param username     The username for which to create an account.
      * @param organization The name of the organization.
@@ -116,14 +116,14 @@ public class UserController {
      *         or not.
      */
     @Operation(summary = "Create an account for a given user", description = "Create a user account.")
-    @PostMapping("/{partner_id}/{username}")
+    @PostMapping("/{realm_id}/{username}")
     public boolean createUser(
-            @Parameter(description = "The partner ID of the user for which to create an account.") @PathVariable("partner_id") String partnerId,
+            @Parameter(description = "The realm ID of the user for which to create an account.") @PathVariable("realm_id") String realmId,
             @Parameter(description = "The username for which to create an account.") @PathVariable("username") String username,
             @Parameter(description = "The name of the organization.") @RequestParam("organization") String organization,
             @RequestBody(required = true) @Schema(example = UserExamples.CREATE) UserSchema user) {
-        // Concatenate partnerId, delimiter, and username to form uniqueUsername
-        String uniqueUsername = partnerId + delimiter + username;
+        // Concatenate realmId, delimiter, and username to form uniqueUsername
+        String uniqueUsername = UserUtils.getUniqueUsername(realmId, delimiter, username);
 
         // Set the userName field of the UserSchema object to uniqueUsername. Path
         // variable takes precedence over body value.
@@ -136,7 +136,7 @@ public class UserController {
     /**
      * Removes an account for a given user.
      * 
-     * @param partnerId    The partner ID of the user for which to remove the
+     * @param realmId      The realm ID of the user for which to remove the
      *                     account.
      * @param username     The username for which to remove the account.
      * @param organization The name of the organization.
@@ -144,15 +144,15 @@ public class UserController {
      *         was deleted successfully or not.
      */
     @Operation(summary = "Remove an account for a given user", description = "Remove a user account.")
-    @DeleteMapping(value = "/{partner_id}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{realm_id}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String deleteUser(
-            @Parameter(description = "The partner ID of the user for which to remove the account.") @PathVariable("partner_id") String partnerId,
+            @Parameter(description = "The realm ID of the user for which to remove the account.") @PathVariable("realm_id") String realmId,
             @Parameter(description = "The username for which to remove the account.") @PathVariable("username") String username,
             @Parameter(description = "The name of the organization.") @RequestParam("organization") String organization) {
 
-        // Construct the unique username for the given user by concatenating partnerId,
+        // Construct the unique username for the given user by concatenating realmId,
         // delimiter, and username
-        String uniqueUsername = partnerId + delimiter + username;
+        String uniqueUsername = UserUtils.getUniqueUsername(realmId, delimiter, username);
 
         // Call the deleteUser method of the userService and return the result as a JSON
         // string
@@ -169,7 +169,7 @@ public class UserController {
      * @return A string message indicating that this method is not implemented yet.
      */
     @Operation(summary = "Update an account for a given user", description = "Update a user account.")
-    @PatchMapping("/{partner_id}/{username}")
+    @PatchMapping("/{realm_id}/{username}")
     public String updateUser(
 
     ) {

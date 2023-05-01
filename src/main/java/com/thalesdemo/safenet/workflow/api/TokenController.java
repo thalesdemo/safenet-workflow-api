@@ -80,9 +80,9 @@ public class TokenController {
     @ApiResponse(responseCode = "404", description = "User not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
 
-    @GetMapping("/tokens/{partner_id}/{username}")
+    @GetMapping("/tokens/{realm_id}/{username}")
     public List<TokenSchema> getTokensByUsername(
-            @Parameter(description = "The partner ID of the user for which to retrieve token(s) information.") @PathVariable("partner_id") String partnerId,
+            @Parameter(description = "The realm ID of the user for which to retrieve token(s) information.") @PathVariable("realm_id") String realmId,
             @Parameter(description = "The username for which to retrieve token(s) information.") @PathVariable("username") String username,
             @Parameter(description = "The name of the organization.") @RequestParam(value = "organization") String organization,
             @Parameter(description = "The type of token(s) for which to retrieve information.", schema = @Schema(type = "string", allowableValues = {
@@ -94,8 +94,8 @@ public class TokenController {
             })) @RequestParam(value = "token_state", required = false) TokenState tokenState) {
 
         try {
-            // Concatenate partnerId and username to create a uniqueUsername
-            String uniqueUsername = partnerId + delimiter + username;
+            // Concatenate realmId and username to create a uniqueUsername
+            String uniqueUsername = UserUtils.getUniqueUsername(realmId, delimiter, username);
 
             // Retrieve the requested token information
             return this.tokenService.getTokensByUsername(uniqueUsername, organization, tokenType, tokenState);
@@ -152,7 +152,7 @@ public class TokenController {
     /**
      * Revokes token(s) associated with a user's account.
      * 
-     * @param partnerId    The partner ID of the user for which to revoke token(s).
+     * @param realmId      The realm ID of the user for which to revoke token(s).
      *                     This is a required path variable.
      * @param username     The username for which to revoke token(s).
      *                     This is a required path variable.
@@ -164,9 +164,9 @@ public class TokenController {
      *                     This is an optional query parameter.
      */
     @Operation(summary = "Revoke token(s) from a user", description = "Revoke token(s) associated with a user's account.")
-    @DeleteMapping("/tokens/{partner_id}/{username}")
+    @DeleteMapping("/tokens/{realm_id}/{username}")
     public Map<String, Boolean> revokeTokensByUsername(
-            @Parameter(description = "The partner ID of the user for which to revoke token(s).") @PathVariable("partner_id") String partnerId,
+            @Parameter(description = "The realm ID of the user for which to revoke token(s).") @PathVariable("realm_id") String realmId,
             @Parameter(description = "The username for which to revoke token(s).") @PathVariable("username") String username,
             @Parameter(description = "The name of the organization.") @RequestParam(value = "organization") String organization,
             @Parameter(description = "The type of token(s) for which to revoke.", schema = @Schema(type = "string", allowableValues = {
@@ -177,8 +177,8 @@ public class TokenController {
                     "Active", "Suspended", "Locked"
             })) @RequestParam(value = "token_state", required = false) TokenState tokenState) {
 
-        // Combine the partner ID and username to get the unique username
-        String uniqueUsername = partnerId + delimiter + username;
+        // Combine the realm ID and username to get the unique username
+        String uniqueUsername = UserUtils.getUniqueUsername(realmId, delimiter, username);
 
         // Call the revokeTokenByUsername() method of the tokenService object
         // to revoke the tokens and get the status of each revocation request.
