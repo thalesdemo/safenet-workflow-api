@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  safenet-workflow-api:
+    image: thalesdemo/safenet-workflow-api:0.0.1-arm64
+    container_name: safenet-workflow-api
+    environment:
+      SAFENET_WORKFLOW_PORT: ${SAFENET_WORKFLOW_PORT-8080}
+      SAFENET_WORKFLOW_LOG_LEVEL: ${SAFENET_WORKFLOW_LOG_LEVEL-INFO}
+      SAFENET_WORKFLOW_USER_DELIMITER: ${SAFENET_WORKFLOW_USER_DELIMITER-@}
+    volumes:
+      - type: bind
+        source: ${HOST_SAFENET_WORKFLOW_CONFIG_PATH-./settings.json}
+        target: /app/settings.json
+    ports:
+      - ${SAFENET_WORKFLOW_PORT-8080}:${SAFENET_WORKFLOW_PORT-8080}

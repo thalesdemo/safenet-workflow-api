@@ -19,7 +19,7 @@ This guide offers a comprehensive overview of utilizing the SafeNet RESTful Work
 To utilize the SafeNet RESTful Workflow API via the JAR file, ensure you have the following prerequisites in place:
 
 1. Java Runtime Environment (JRE) version 11 installed on your system.
-2. An operator account for your SafeNet Trusted Access (STA) or SafeNet Authentication Service (SAS-PCE) tenant, configured with a static password. Refer to this guide for assistance.
+2. An operator account for your SafeNet Trusted Access (STA) or SafeNet Authentication Service (SAS-PCE) tenant, configured with a static password. Refer to [this guide](https://thalesdocs.com/sta/operator/tokens/tkn_pw_temp/index.html) for assistance.
 
 ## Deployment Steps
 
@@ -89,7 +89,7 @@ Execute the JAR file using the command below:
 
     java -DSAFENET_WORKFLOW_LOG_LEVEL=INFO \
          -DSAFENET_WORKFLOW_PORT=8888 \
-         -DSAFENET_WORKFLOW_CONFIG_PATH./settings.json \
+         -DSAFENET_WORKFLOW_CONFIG_PATH=./settings.json \
          -jar safenet-workflow-api-[version].jar
 
 This command defines several optional environment variables that the Java application can leverage:
