@@ -47,6 +47,9 @@ import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class WorkflowService {
@@ -63,7 +66,9 @@ public class WorkflowService {
     private Settings settings;
 
     private static final int MAX_RETRIES_BSIDCA = 3; // per getBsidca() call
-    private static final int RECONNECT_INTERVAL = 1000; // milliseconds
+    private static final int RECONNECT_INTERVAL = 1000; // 1 second in milliseconds
+    private ScheduledExecutorService reconnectExecutor;
+    private int reconnectAttempts;
 
     /**
      * Attempts to reconnect to the third-party web service at a fixed rate
@@ -71,8 +76,15 @@ public class WorkflowService {
      */
     // @Scheduled(fixedRate = RECONNECT_INTERVAL)
     private void reconnect() {
-        // TODO: add delay between retries
-        this.newConnectSession();
+        reconnectAttempts++;
+        if (reconnectAttempts <= MAX_RETRIES_BSIDCA) {
+            String infoMessage = String.format("Trying to re-connect (attempt# %d/%d)", reconnectAttempts,
+                    MAX_RETRIES_BSIDCA);
+            Log.info(infoMessage);
+            this.newConnectSession();
+        } else {
+            reconnectExecutor.shutdown(); // Stop scheduling reconnect attempts
+        }
     }
 
     /**
@@ -86,6 +98,8 @@ public class WorkflowService {
     public WorkflowService(Settings settings) {
 
         this.settings = settings;
+        reconnectExecutor = Executors.newSingleThreadScheduledExecutor();
+        reconnectAttempts = 0;
         try {
             this.bsidca = new BSIDCAStub(settings.getBsidcaUrl());
             setContextProperties(this.bsidca);
@@ -110,15 +124,9 @@ public class WorkflowService {
      */
     public BSIDCAStub getBsidca() {
 
-        int i = 1;
-
-        while (!this.pingConnection() && i <= MAX_RETRIES_BSIDCA) {
-            String infoMessage = String.format("Trying to re-connect (attempt# %d/%d)", i, MAX_RETRIES_BSIDCA);
-            Log.info(infoMessage);
-            this.reconnect();
-            i++;
+        if (!pingConnection()) {
+            reconnectExecutor.scheduleAtFixedRate(this::reconnect, 0, RECONNECT_INTERVAL, TimeUnit.MILLISECONDS);
         }
-
         return bsidca;
     }
 
@@ -222,6 +230,7 @@ public class WorkflowService {
             }
 
             Log.info("Authentication result: " + crd.getConnectResponse().getConnectResult());
+            reconnectAttempts = 0; // Reset reconnect attempts on successful authentication
 
         } catch (Exception e) {
             Log.log(Level.SEVERE, "Failed to connect! ", e);
@@ -240,6 +249,7 @@ public class WorkflowService {
                     .getPingConnectionResult();
             String debugMessage = "BSIDCA connection status: " + pingResult;
             Log.fine(debugMessage);
+            Log.log(Level.FINE, "Raw ping result: {0}", pingResult);
             return pingResult;
         } catch (RemoteException e) {
             return false;

@@ -124,7 +124,7 @@ public class EnrollmentService {
                     return response;
                 } else if (tokenData.getState().equals(EnrollmentStatus.COMPLETE.getValue())) {
                     // If enrollment was successful, update response message accordingly
-                    if (tokenData.getTokenType() == TokenType.GRIDSURE) {
+                    if (enrollmentRequest.getTokenType() == TokenType.GRIDSURE) {
                         response.setMessage("Your authenticator has been successfully activated!");
                     } else {
                         response.setMessage("Enroll your authenticator with the following activation link.");
