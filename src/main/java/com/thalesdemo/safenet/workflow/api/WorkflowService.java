@@ -62,19 +62,45 @@ public class WorkflowService {
 
     private static final Logger Log = Logger.getLogger(WorkflowService.class.getName());
 
+    /**
+     * An instance of the SafeNet BSIDCA web service stub.
+     */
     private BSIDCAStub bsidca;
+
+    /**
+     * An instance of the Settings class, which stores the configuration
+     * settings for the application.
+     */
     private Settings settings;
 
-    private static final int MAX_RETRIES_BSIDCA = 3; // per getBsidca() call
-    private static final int RECONNECT_INTERVAL = 1000; // 1 second in milliseconds
+    /**
+     * The maximum number of reconnect attempts allowed per getBsidca() call.
+     */
+    private static final int MAX_RETRIES_BSIDCA = 3;
+
+    /**
+     * The interval between reconnect attempts in milliseconds (1000ms = 1 second).
+     */
+    private static final int RECONNECT_INTERVAL = 1000;
+
+    /**
+     * A ScheduledExecutorService used for scheduling reconnect attempts at
+     * a fixed rate defined by RECONNECT_INTERVAL.
+     */
     private ScheduledExecutorService reconnectExecutor;
+
+    /**
+     * A counter for the number of reconnect attempts made during a getBsidca()
+     * call.
+     */
     private int reconnectAttempts;
 
     /**
      * Attempts to reconnect to the third-party web service at a fixed rate
-     * defined by RECONNECT_INTERVAL.
+     * defined by RECONNECT_INTERVAL. The reconnect attempts will stop when a
+     * connection is successfully established or when the maximum number of
+     * retries (MAX_RETRIES_BSIDCA) is reached.
      */
-    // @Scheduled(fixedRate = RECONNECT_INTERVAL)
     private void reconnect() {
         reconnectAttempts++;
         if (reconnectAttempts <= MAX_RETRIES_BSIDCA) {
@@ -82,24 +108,35 @@ public class WorkflowService {
                     MAX_RETRIES_BSIDCA);
             Log.info(infoMessage);
             this.newConnectSession();
+
+            if (pingConnection()) {
+                // Stop scheduling reconnect attempts if the connection is successful
+                reconnectExecutor.shutdown();
+            }
         } else {
-            reconnectExecutor.shutdown(); // Stop scheduling reconnect attempts
+            // Stop scheduling reconnect attempts after reaching the maximum retries
+            reconnectExecutor.shutdown();
         }
     }
 
     /**
      * Constructor for the WorkflowService class. Initializes the settings and
-     * BSIDCAStub objects and calls newConnectSession to establish a connection
-     * to the SafeNet (BSIDCA) web service.
-     * 
+     * BSIDCAStub objects, and calls newConnectSession to establish a connection
+     * to the SafeNet (BSIDCA) web service. It also initializes the
+     * reconnectExecutor and sets the initial reconnectAttempts to 0.
+     *
      * @param settings The application settings used to connect to the BSIDCA
      *                 web service.
      */
     public WorkflowService(Settings settings) {
 
         this.settings = settings;
+
+        // Initialize the reconnectExecutor with a single thread
         reconnectExecutor = Executors.newSingleThreadScheduledExecutor();
+        // Reset reconnectAttempts counter
         reconnectAttempts = 0;
+
         try {
             this.bsidca = new BSIDCAStub(settings.getBsidcaUrl());
             setContextProperties(this.bsidca);
@@ -109,16 +146,17 @@ public class WorkflowService {
             e.printStackTrace();
         }
 
+        // Establish the initial connection to the BSIDCA web service
         this.newConnectSession();
-
     }
 
     /**
      * Returns the BSIDCAStub object used to connect to the SafeNet (BSIDCA)
      * web service.
-     * If the connection is lost or the connection is not established, this method
-     * will attempt to reconnect up to MAX_RETRIES_BSIDCA times.
-     * 
+     * If the connection is lost or not yet established, this method will
+     * attempt to reconnect up to MAX_RETRIES_BSIDCA times, with a delay of
+     * RECONNECT_INTERVAL between each attempt.
+     *
      * @return A BSIDCAStub object used to connect to the SafeNet (BSIDCA) web
      *         service.
      */
@@ -198,7 +236,9 @@ public class WorkflowService {
     /**
      * This method creates a new session with the BSIDCA service. It uses the
      * operator email, OTP, and validation code from the settings to connect to the
-     * service. If the connection fails, the method logs an error message with the
+     * service. If the connection is successful, it resets the reconnectAttempts
+     * counter.
+     * In case of connection failure, the method logs an error message with the
      * cause of the failure.
      */
     public void newConnectSession() {
@@ -249,7 +289,6 @@ public class WorkflowService {
                     .getPingConnectionResult();
             String debugMessage = "BSIDCA connection status: " + pingResult;
             Log.fine(debugMessage);
-            Log.log(Level.FINE, "Raw ping result: {0}", pingResult);
             return pingResult;
         } catch (RemoteException e) {
             return false;
