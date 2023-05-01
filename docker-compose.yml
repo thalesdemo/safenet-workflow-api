@@ -2,7 +2,7 @@ version: '3'
 
 services:
   safenet-workflow-api:
-    image: thalesdemo/safenet-workflow-api:0.0.1-arm64
+    image: thalesdemo/safenet-workflow-api
     container_name: safenet-workflow-api
     environment:
       SAFENET_WORKFLOW_PORT: ${SAFENET_WORKFLOW_PORT-8080}
