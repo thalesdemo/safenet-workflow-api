@@ -6,11 +6,15 @@
 
 <h2>Important Notice</h2>
 
-Thank you for your interest in our demo project! It is important to note that the project is in development. <b>Please use the project at your own discretion and assume any potential risks associated with its use</b>.
+Thank you for your interest in our demo project! It is important to note that the project is in development. Please also note that this project has been independently developed and is not an official software released by Thales for end-users or developers. <b>Please use the project at your own discretion and assume any potential risks associated with its use. </b>
 
 <h2>Summary</h2>
 
-The SafeNet Workflow API is a RESTful microservice that simplifies both user and token management by providing easy-to-use endpoints for token creation and revocation. The Workflow API streamlines the token management process for developers and offers advanced features such as flexible token enrollment methods triggered by three possible ways: email, a direct URL link, or API calls. The email enrollment method allows app developers to embed a unique enrollment link in an email and send it to users. The direct URL link method allows app developers to embed the enrollment link directly in their application and redirect users to the enrollment page of the authentication server. The API enrollment method offers a richer, more customizable user experience, allowing app developers to control the look and feel of the enrollment process while providing a native experience without having to expose the authentication service endpoints or enrollment page. With the SafeNet Workflow API, you can efficiently manage both users and tokens, giving you full control over your user registration process and ensuring a seamless user experience for your customers.
+The SafeNet Workflow API is a RESTful microservice that simplifies both user and token management by providing easy-to-use endpoints for token creation and revocation, along with user creation and deletion. The Workflow API streamlines the token management process for developers and offers advanced features such as flexible token enrollment methods in three possible ways: email, a direct URL link, or API calls.
+
+With the email enrollment method, app developers can embed a unique enrollment link in an email and send it to users directly through the SafeNet authentication platform. In comparison, the direct URL link method allows app developers to embed the enrollment link directly in their application and redirect users to the enrollment page of the authentication server. With the third option, the API enrollment method offers a richer, more customizable user experience, allowing app developers to control the look and feel of the enrollment process while providing a native experience without ever having to expose the authentication service endpoints or for that matter without redirecting to the SafeNet enrollment page.
+
+With the SafeNet Workflow API, you can efficiently manage both users and tokens, giving you full control over your user registration process. It ensures a streamlined user experience in enabling versatile multi-factor authentication options, such as our GrIDsure pattern-based authentication, our MobilePASS+ software authenticator with biometrics support and Push OTP authentication, along with various other OATH-based support options: SMS, Email, Voice, Hardware OTP, Google Authenticator, and more.
 
 <h2>Deployment Guidelines</h2>
 
@@ -69,6 +73,8 @@ docker-compose up
 ```
 
 Then, follow the instructions that appear on the screen to get your unique client header key. You must supply this key in the `X-API-Key` header for every HTTP request.
+
+> **NOTE:** When using the Docker version of the application, the `settings.json` file serves as a virtual map to the host as per the `docker-compose.yml` file. This means that any changes made to `settings.json` are stored on the host machine. The launcher script within the Docker container checks if the `key_hash` key is present in `settings.json`. If the key is present, it is used to authenticate requests to the API. If the key is not present, the launcher script generates a new key and stores it in `settings.json`. This way, each deployment of the Docker container has a unique key, ensuring security and preventing unauthorized access. The `key_hash` is stored in `settings.json`, which is then mapped to the host machine, ensuring that the key is persistent across container restarts. If you want to create your own `X-API-Key` and associated hash `'key_hash'` then please follow the instructions referenced in [Step 1: Generate an API Key](https://github.com/thalesdemo/safenet-workflow-api/tree/main/jar#step-1-generate-an-api-key) of the JAR installation guide.
 
 <h2>API Reference</h2>
 
